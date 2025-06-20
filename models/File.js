@@ -5,7 +5,7 @@ const fileSchema = new mongoose.Schema({
     originalName: String,
     size: Number,
     mimeType: String,
-    url: String, // ini nanti bisa jadi link cloudinary atau storage lain
+    url: String,
     public_id: String,
     createdAt: {
         type: Date,
