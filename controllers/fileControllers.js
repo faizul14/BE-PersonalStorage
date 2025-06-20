@@ -10,7 +10,7 @@ const uploadFile = async (req, res) => {
             originalName: file.originalname,
             size: file.size,
             mimeType: file.mimetype,
-            url: file.path, // ini adalah URL public dari Cloudinary
+            url: file.path,
             public_id: file.filename
         })
 

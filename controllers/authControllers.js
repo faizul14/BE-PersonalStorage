@@ -1,6 +1,6 @@
 const File = require('../models/FileUsers')
 const { decrypt, bcryptCompare } = require('../algoritm/algoritm')
-const { generateJwt, verifyJwt } = require('../middleware/authMiddleware')
+const { generateJwt } = require('../middleware/authMiddleware')
 
 const createUsers = async (req, res) => {
     try {
@@ -59,11 +59,6 @@ const loginUsers = async (req, res) => {
         token: generateToken
     }
     )
-}
-
-const getFiles = async (req, res) => {
-    const files = await File.find().sort({ createdAt: -1 })
-    res.json(files)
 }
 
 
