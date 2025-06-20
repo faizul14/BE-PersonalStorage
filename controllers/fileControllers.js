@@ -1,24 +1,6 @@
 const File = require('../models/File')
 const cloudinary = require('../cloudinary/cloudinary')
 
-// const uploadFile = async (req, res) => {
-//     try {
-//         const file = req.file
-
-//         const savedFile = await File.create({
-//             filename: file.filename,
-//             originalName: file.originalname,
-//             size: file.size,
-//             mimeType: file.mimetype,
-//             url: `uploads/${file.filename}` // nanti ini bisa diganti link CDN
-//         })
-
-//         res.status(201).json(savedFile)
-//     } catch (err) {
-//         res.status(500).json({ message: err.message })
-//     }
-// }
-
 const uploadFile = async (req, res) => {
     try {
         const file = req.file
