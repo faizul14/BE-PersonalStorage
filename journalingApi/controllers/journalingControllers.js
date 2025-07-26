@@ -1,86 +1,4 @@
 const File = require('../models/FileJournaling')
-// const cloudinary = require('../cloudinary/cloudinary')
-
-// const uploadFile = async (req, res) => {
-//     try {
-//         const file = req.file
-
-//         const savedFile = await File.create({
-//             filename: file.filename,
-//             originalName: file.originalname,
-//             size: file.size,
-//             mimeType: file.mimetype,
-//             url: file.path,
-//             public_id: file.filename
-//         })
-
-//         res.status(201).json(savedFile)
-//     } catch (err) {
-//         console.error(err)
-//         res.status(500).json({ message: 'Upload failed' })
-//     }
-// }
-
-// const getFiles = async (req, res) => {
-//     const files = await File.find().sort({ createdAt: -1 })
-//     res.json(files)
-// }
-
-// const deleteFile = async (req, res) => {
-//     try {
-//         const file = await File.findById(req.params.id)
-
-//         if (!file) return res.status(404).json({ message: 'File not found' })
-
-//         let resourceType = 'image'
-//         if (file.mimeType.startsWith('video')) {
-//             resourceType = 'video'
-//         } else if (!file.mimeType.startsWith('image')) {
-//             resourceType = 'raw'
-//         }
-//         // Hapus dari Cloudinary
-//         await cloudinary.uploader.destroy(file.public_id, {
-//             resource_type: resourceType
-//         })
-
-//         // Hapus dari MongoDB
-//         await file.deleteOne()
-
-//         res.status(200).json({ message: 'File deleted successfully' })
-//     } catch (err) {
-//         console.error(err)
-//         res.status(500).json({ message: 'Delete failed' })
-//     }
-// }
-
-// const createUsers = async (req, res) => {
-//     try {
-//         const { username, password } = req.body
-
-//         if (!username || !password) {
-//             return res.status(400).json({ message: 'Username dan password wajib diisi' })
-//         }
-
-//         const checkIsExist = await File.findOne({ 'username': username })
-//         if (checkIsExist) return res.status(400).json({
-//             message: 'Username already exist'
-//         })
-
-//         const passDcrypt = await decrypt(password)
-
-//         const signUp = await File.create({
-//             username: username,
-//             password: passDcrypt,
-//         })
-
-//         res.status(201).json({
-//             message: 'SignUp succesful'
-//         })
-//     } catch (err) {
-//         console.error(err)
-//         res.status(500).json({ message: 'SignUp failed' })
-//     }
-// }
 
 const createJournaling = async (req, res) => {
     try {
@@ -122,6 +40,22 @@ const getJournaling = async (req, res) => {
     res.status(200).json(files)
 }
 
+const getJournalingDetail = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const detailJournaling = await File.findOne({ _id: id })
+        return res
+            .status(200)
+            .json(detailJournaling)
+    } catch (err) {
+        return res
+            .status(404)
+            .json({
+                message: "Journaling not found."
+            })
+    }
+}
+
 const deleteJournaling = async (req, res) => {
     try {
         const file = await File.findById(req.params.id)
@@ -139,4 +73,4 @@ const deleteJournaling = async (req, res) => {
 }
 
 
-module.exports = { createJournaling, getJournaling, deleteJournaling }
+module.exports = { createJournaling, getJournaling, deleteJournaling, getJournalingDetail }
