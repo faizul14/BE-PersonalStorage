@@ -3,6 +3,7 @@ const cors = require('cors')
 const fileRoutes = require('./routes/fileRoutes')
 const usersRoutes = require('./routes/authRoutes')
 const publicRoutes = require('./routes/publicRoutes')
+const journalingRoutes = require('./journalingApi/routes/journalingRoutes')
 const { authPermisionMiddleware } = require('./middleware/authMiddleware')
 
 const app = express()
@@ -18,5 +19,7 @@ app.get('/', (req, res) => {
 app.use('/auth', usersRoutes)
 app.use('/api/files', authPermisionMiddleware, fileRoutes)
 app.use('/api/public/files', publicRoutes)
+
+app.use('/api/journaling', journalingRoutes)
 
 module.exports = app
