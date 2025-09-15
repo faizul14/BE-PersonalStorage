@@ -2,7 +2,7 @@ const File = require('../models/FileJournaling')
 
 const createJournaling = async (req, res) => {
     try {
-        const { author, emotional, tittle, keyword, content } = req.body;
+        const { author, emotional, tittle, keyword, phonetic, content } = req.body;
 
         if (!tittle || !keyword || !content) {
             return res
@@ -16,7 +16,7 @@ const createJournaling = async (req, res) => {
             emotional: emotional,
             tittle: tittle,
             keyword: keyword,
-            phonetic: 'phonetic',
+            phonetic: phonetic,
             content: content
         })
 
