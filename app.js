@@ -5,6 +5,7 @@ const usersRoutes = require('./routes/authRoutes')
 const publicRoutes = require('./routes/publicRoutes')
 const journalingRoutes = require('./journalingApi/routes/journalingRoutes')
 const publicjournalingRoutes = require('./journalingApi/routes/publicjournalingRoutes')
+const xltoken = require('./apitokenxl/routes/tokenRoutes')
 const { authPermisionMiddleware } = require('./middleware/authMiddleware')
 
 const app = express()
@@ -14,7 +15,7 @@ app.use(express.json())
 
 // ✅ Test route
 app.get('/', (req, res) => {
-    res.send('Welcome to Faezol\'s File Storage API 🚀')
+    res.send('Welcome to Faezol\'s Service API 🚀')
 })
 
 // 🚀 Api for personal storage
@@ -26,5 +27,8 @@ app.use('/api/public/files', publicRoutes)
 // 🚀 Api for journaling
 app.use('/api/public/journaling', publicjournalingRoutes)
 app.use('/api/journaling', authPermisionMiddleware ,journalingRoutes)
+
+// 🚀 Api for xl terminal
+app.use('/api/xltoken', xltoken)
 
 module.exports = app
