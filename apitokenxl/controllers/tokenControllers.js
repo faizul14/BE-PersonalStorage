@@ -85,6 +85,39 @@ const checkTokenXL = async (req, res) => {
     }
 }
 
+const publiccheckTokenXL = async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) {
+            return res.status(400).json({ message: 'Token is required.' });
+        }
+        const tokenIsValid = await File.findOne({ token: token })
+        if (!tokenIsValid) {
+            return res
+                .status(404)
+                .json({
+                    message: 'Token not found or revoked.',
+                })
+        }
+        if (!tokenIsValid.isactive) {
+            return res.status(401).json({ isactive: false, message: 'Token has been deactivated.'});
+        }
+
+        return res.status(200).json({
+            isactive: true,
+            message: 'Token is valid and active.',
+            data: tokenIsValid,
+        });
+    } catch (err) {
+        res
+            .status(500)
+            .json({
+                message: 'Failed check token.',
+                error: err.message
+            })
+    }
+}
+
 const updateTokenXL = async (req, res) => {
     try {
         const id = req.params.id;
@@ -148,4 +181,4 @@ const deleteTokenXL = async (req, res) => {
     }
 }
 
-module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL }
+module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL }
