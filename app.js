@@ -26,9 +26,9 @@ app.use('/api/public/files', publicRoutes)
 
 // 🚀 Api for journaling
 app.use('/api/public/journaling', publicjournalingRoutes)
-app.use('/api/journaling', authPermisionMiddleware ,journalingRoutes)
+app.use('/api/journaling', authPermisionMiddleware, journalingRoutes)
 
 // 🚀 Api for xl terminal
-app.use('/api/xltoken', xltoken)
+app.use('/api/xltoken', authPermisionMiddleware, xltoken)
 
 module.exports = app
