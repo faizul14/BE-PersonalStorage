@@ -7,6 +7,8 @@ const journalingRoutes = require('./journalingApi/routes/journalingRoutes')
 const publicjournalingRoutes = require('./journalingApi/routes/publicjournalingRoutes')
 const xltoken = require('./apitokenxl/routes/tokenRoutes')
 const publicxltoken = require('./apitokenxl/routes/tokenPublicRoutes')
+const xlinformation = require('./apitokenxl/routes/informationRoutes')
+const publicxlinformation = require('./apitokenxl/routes/informationPublicRoutes')
 const { authPermisionMiddleware } = require('./middleware/authMiddleware')
 
 const app = express()
@@ -32,5 +34,7 @@ app.use('/api/journaling', authPermisionMiddleware, journalingRoutes)
 // 🚀 Api for xl terminal
 app.use('/api/xltoken', authPermisionMiddleware, xltoken)
 app.use('/api/public/xltoken', publicxltoken)
+app.use('/api/xlinformation', authPermisionMiddleware, xlinformation)
+app.use('/api/public/xlinformation', publicxlinformation)
 
 module.exports = app
