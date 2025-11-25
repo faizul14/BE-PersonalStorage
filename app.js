@@ -32,8 +32,7 @@ app.use('/api/public/journaling', publicjournalingRoutes)
 app.use('/api/journaling', authPermisionMiddleware, journalingRoutes)
 
 // 🚀 Api for xl terminal
-// app.use('/api/xltoken', authPermisionMiddleware, xltoken)
-app.use('/api/xltoken', xltoken)
+app.use('/api/xltoken', authPermisionMiddleware, xltoken)
 app.use('/api/public/xltoken', publicxltoken)
 app.use('/api/xlinformation', authPermisionMiddleware, xlinformation)
 app.use('/api/public/xlinformation', publicxlinformation)
