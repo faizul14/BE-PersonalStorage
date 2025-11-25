@@ -4,7 +4,7 @@ const { expiredTokenDate } = require('../algoritm/expiredTokenDate')
 
 const createTokenXL = async (req, res) => {
     try {
-        const { username, expired } = req.body;
+        const { username, expired, transactionslimit } = req.body;
 
         const isSame = (await File.findOne({ username: username }))
 
@@ -25,11 +25,13 @@ const createTokenXL = async (req, res) => {
         }
         const generateToken = generateTokenXL(32);
         const dayOfExpired = expiredTokenDate(Number(expired))
+        const limit = !transactionslimit ? 1 : transactionslimit
 
         const create = await File.create({
             username: username,
             token: generateToken,
             isactive: true,
+            transactionslimit: limit,
             expiredAt: dayOfExpired
         })
 
@@ -71,10 +73,59 @@ const checkTokenXL = async (req, res) => {
             return res.status(401).json({ isactive: false, message: 'Token has been deactivated.' });
         }
 
+        if (tokenIsValid.transactionslimit <= 0) {
+            return res.status(401).json({ isactive: false, message: 'Token limit transactions.' });
+        }
+
         return res.status(200).json({
             isactive: true,
             message: 'Token is valid and active.',
         });
+    } catch (err) {
+        res
+            .status(500)
+            .json({
+                message: 'Failed check token.',
+                error: err.message
+            })
+    }
+}
+
+
+const transactionsLimitInvoke = async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) {
+            return res.status(400).json({ message: 'Token is required.' });
+        }
+        const tokenIsValid = await File.findOne({ token: token })
+        if (!tokenIsValid) {
+            return res
+                .status(404)
+                .json({
+                    message: 'Token not found or revoked.',
+                })
+        }
+
+        if (tokenIsValid.transactionslimit <= 0) {
+            return res.status(400).json({
+                message: "Token has been limit transaction."
+            })
+        }
+        const id = tokenIsValid._id;
+        const transactionsInvoke = await File.findByIdAndUpdate(
+            id,
+            {
+                $inc: {
+                    transactionslimit: - 1
+                }
+            },
+            { new: true }
+        )
+        return res.status(200).json({
+            message: 'Transactions succes.',
+            data: updateTokenXL
+        })
     } catch (err) {
         res
             .status(500)
@@ -100,7 +151,7 @@ const publiccheckTokenXL = async (req, res) => {
                 })
         }
         if (!tokenIsValid.isactive) {
-            return res.status(401).json({ isactive: false, message: 'Token has been deactivated.'});
+            return res.status(401).json({ isactive: false, message: 'Token has been deactivated.' });
         }
 
         return res.status(200).json({
@@ -121,7 +172,7 @@ const publiccheckTokenXL = async (req, res) => {
 const updateTokenXL = async (req, res) => {
     try {
         const id = req.params.id;
-        const { expiredAt } = req.body;
+        const { expiredAt, transactionslimit } = req.body;
 
         const dataIsActive = await File.findById(id)
         if (!dataIsActive || !expiredAt) {
@@ -132,7 +183,7 @@ const updateTokenXL = async (req, res) => {
         const newExpired = expiredTokenDate(expiredAt)
         const updateTokenXL = await File.findByIdAndUpdate(
             id,
-            { isactive: true, expiredAt: newExpired },
+            { isactive: true, transactionslimit: transactionslimit, expiredAt: newExpired },
             { new: true }
         )
         return res.status(200).json({
@@ -164,6 +215,7 @@ const revokedTokenXL = async (req, res) => {
             data: updateTokenXL
         })
     } catch (err) {
+        console.log(err)
         res.status(500).json({ message: 'Failed update token' });
     }
 }
@@ -181,4 +233,4 @@ const deleteTokenXL = async (req, res) => {
     }
 }
 
-module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL }
+module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL, transactionsLimitInvoke }
