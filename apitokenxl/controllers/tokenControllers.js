@@ -1,5 +1,5 @@
 const File = require('../models/FileToken')
-const { generateTokenXL } = require('../algoritm/generateToken')
+const { generateTokenXL, generateTokenCustomXL } = require('../algoritm/generateToken')
 const { expiredTokenDate } = require('../algoritm/expiredTokenDate')
 
 const createTokenXL = async (req, res) => {
@@ -25,6 +25,55 @@ const createTokenXL = async (req, res) => {
         }
         const generateToken = generateTokenXL(32);
         const dayOfExpired = expiredTokenDate(Number(expired))
+        const limit = !transactionslimit ? 1 : transactionslimit
+
+        const create = await File.create({
+            username: username,
+            token: generateToken,
+            isactive: true,
+            transactionslimit: limit,
+            expiredAt: dayOfExpired
+        })
+
+        res
+            .status(201)
+            .json({
+                message: 'Succes Ceate Token'
+            })
+    } catch (err) {
+        res
+            .status(400)
+            .json({
+                message: 'Failed Ceate Token',
+                error: err.message
+            })
+    }
+}
+
+const createTokenCustomXL = async (req, res) => {
+    try {
+        const { username, expired, transactionslimit } = req.body;
+
+        const isSame = (await File.findOne({ username: username }))
+
+        if (isSame) {
+            return res
+                .status(409)
+                .json({
+                    message: `Username already exist`
+                })
+        }
+
+        if (!username || !expired) {
+            return res
+                .status(400)
+                .json({
+                    message: 'Username/Expired can not empty'
+                })
+        }
+        const uinxToken = username.toUpperCase();
+        const generateToken = generateTokenCustomXL(uinxToken, 6);
+        const dayOfExpired = expiredTokenDate(Number(expired));
         const limit = !transactionslimit ? 1 : transactionslimit
 
         const create = await File.create({
@@ -233,4 +282,4 @@ const deleteTokenXL = async (req, res) => {
     }
 }
 
-module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL, transactionsLimitInvoke }
+module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL, transactionsLimitInvoke, createTokenCustomXL }
