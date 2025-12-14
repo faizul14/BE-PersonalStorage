@@ -1,4 +1,5 @@
 const File = require('../models/FileToken')
+const FileLogTrans = require('../models/FileLogTransactions')
 const { generateTokenXL, generateTokenCustomXL } = require('../algoritm/generateToken')
 const { expiredTokenDate } = require('../algoritm/expiredTokenDate')
 
@@ -104,6 +105,11 @@ const getTokenXL = async (req, res) => {
     res.status(200).json(files)
 }
 
+const getTokenLogTransactions = async (req, res) => {
+    const files = await FileLogTrans.find().sort({ createdAt: -1 })
+    res.status(200).json(files)
+}
+
 const checkTokenXL = async (req, res) => {
     try {
         const { token } = req.body;
@@ -171,6 +177,11 @@ const transactionsLimitInvoke = async (req, res) => {
             },
             { new: true }
         )
+
+        const usernameTransactions = tokenIsValid.username
+        const createLogTransactions = await FileLogTrans.create({
+            username: usernameTransactions
+        })
         return res.status(200).json({
             message: 'Transactions succes.',
             data: updateTokenXL
@@ -282,4 +293,4 @@ const deleteTokenXL = async (req, res) => {
     }
 }
 
-module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL, transactionsLimitInvoke, createTokenCustomXL }
+module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL, transactionsLimitInvoke, createTokenCustomXL, getTokenLogTransactions }
