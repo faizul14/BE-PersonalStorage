@@ -2,6 +2,8 @@ const File = require('../models/FileToken')
 const FileLogTrans = require('../models/FileLogTransactions')
 const { generateTokenXL, generateTokenCustomXL } = require('../algoritm/generateToken')
 const { expiredTokenDate } = require('../algoritm/expiredTokenDate')
+const { getIO } = require('../../socket.js')
+
 
 const createTokenXL = async (req, res) => {
     try {
@@ -146,6 +148,11 @@ const checkTokenXL = async (req, res) => {
     }
 }
 
+const socketPushNewLog = (newLog) => {
+    const io = getIO();
+    io.emit('log:new', newLog);
+};
+
 
 const transactionsLimitInvoke = async (req, res) => {
     try {
@@ -182,6 +189,9 @@ const transactionsLimitInvoke = async (req, res) => {
         const createLogTransactions = await FileLogTrans.create({
             username: usernameTransactions
         })
+
+        socketPushNewLog(createLogTransactions)
+        
         return res.status(200).json({
             message: 'Transactions succes.',
             data: updateTokenXL
