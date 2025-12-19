@@ -1,31 +1,62 @@
-# 📁 File Storage API (Express + MongoDB + Cloudinary)
+# core-backend
 
-Backend API untuk upload, menyimpan metadata file di MongoDB Atlas, dan menyimpan file ke Cloudinary. Dibuat oleh Faezol 🚀
+A core backend **monorepo** that hosts multiple backend services within a single repository.  
+This repository serves as the **central backend** for several systems/applications using a **single deployment instance**.
 
-## 🚀 Fitur
+Each service is separated by purpose but runs under one server with centralized routing.
 
-- Upload file dari form atau API (Postman)
-- Simpan metadata ke MongoDB
-- Hapus file dari Cloudinary & MongoDB
-- Akses file di semua device
-- Hosting gratis via Render
+---
 
-## 🧱 Tech Stack
+## 🧩 Architecture Concept
 
-- Express.js
-- MongoDB Atlas
-- Cloudinary (file storage)
-- Multer
-- Render (deployment)
+- **Backend monorepo**
+- **Single deployment**
+- **Multiple services**
+- Centralized routing via `app.js`
+- Shared resources (middleware, models, utilities)
 
-## ⚙️ Setup Lokal
+Suitable for:
+- Personal projects
+- MVPs
+- Multiple backend services with limited infrastructure resources
 
-### 1. Clone repo ini
+---
 
-```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
-npm install
-cp .env.example .env
-npm start
+## 📂 Folder Structure
+
+```text
+core-backend/
+├── algoritm/          # Algorithm logic or experiments
+├── apitokenxl/        # Backend service for XL token management
+├── cloudinary/        # Cloudinary configuration and helpers
+├── journalingApi/     # Backend service for journaling features
+├── controllers/       # Main controllers
+├── routes/            # API routing
+├── middleware/        # Middleware (auth, validation, etc.)
+├── models/            # Database models (MongoDB)
+├── socket.js          # Socket.IO handlers
+├── server.js          # Server entry point
+├── app.js             # Main application & route aggregator
+├── .env.example       # Environment variable template
+├── package.json
+└── README.md
 ```
+
+## 🚀 Tech Stack
+
+- **Node.js**
+- **Express.js**
+- **MongoDB Atlas**
+- **Socket.IO** (Realtime communication)
+- **Cloudinary** (File upload)
+- **JavaScript**
+
+---
+
+## 🧠 Author
+
+**Faezol MP**  
+Backend & Android Engineer
+
+
+
