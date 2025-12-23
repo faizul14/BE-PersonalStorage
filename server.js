@@ -11,7 +11,7 @@ const server = http.createServer(app)
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-        scheduleTokenExpiry(); // job
+        scheduleTokenExpiry(); // job schedule
 
         initSocket(server) // init socket
 
