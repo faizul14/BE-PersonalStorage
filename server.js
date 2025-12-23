@@ -11,7 +11,7 @@ const server = http.createServer(app)
 
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
-        scheduleTokenExpiry(); // job schedule tessting ci
+        scheduleTokenExpiry(); // job schedule tessting ci test ci lagi
 
         initSocket(server) // init socket
 
