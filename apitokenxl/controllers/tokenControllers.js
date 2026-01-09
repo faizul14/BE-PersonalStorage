@@ -112,6 +112,33 @@ const getTokenLogTransactions = async (req, res) => {
     res.status(200).json(files)
 }
 
+const getTokenLogTransactionsByUser = async (req, res) => {
+    try {
+        const { token } = req.body;
+
+        if (!token) {
+            return res.status(400).json({ message: 'Token is required.' });
+        }
+
+        const tokenIsValid = await File.findOne({ token: token });
+        if (!tokenIsValid) {
+            return res.status(404).json({ message: 'Token not found.' });
+        }
+
+        const logs = await FileLogTrans.find({ username: tokenIsValid.username }).sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            message: 'Success get log transactions.',
+            data: logs
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: 'Failed to get log transactions.',
+            error: err.message
+        });
+    }
+}
+
 const checkTokenXL = async (req, res) => {
     try {
         const { token } = req.body;
@@ -191,7 +218,7 @@ const transactionsLimitInvoke = async (req, res) => {
         })
 
         socketPushNewLog(createLogTransactions)
-        
+
         return res.status(200).json({
             message: 'Transactions succes.',
             data: updateTokenXL
@@ -303,4 +330,4 @@ const deleteTokenXL = async (req, res) => {
     }
 }
 
-module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL, transactionsLimitInvoke, createTokenCustomXL, getTokenLogTransactions }
+module.exports = { getTokenXL, createTokenXL, checkTokenXL, deleteTokenXL, updateTokenXL, revokedTokenXL, publiccheckTokenXL, transactionsLimitInvoke, createTokenCustomXL, getTokenLogTransactions, getTokenLogTransactionsByUser }
