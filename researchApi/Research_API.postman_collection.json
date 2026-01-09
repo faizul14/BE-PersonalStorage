@@ -1,0 +1,267 @@
+{
+	"info": {
+		"_postman_id": "research-api-collection",
+		"name": "Research API",
+		"description": "API endpoints for Research/Journal service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "YOUR_JWT_TOKEN_HERE",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Public",
+			"item": [
+				{
+					"name": "Get All Research",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/research?category=&search=&page=1&limit=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "research"],
+							"query": [
+								{
+									"key": "category",
+									"value": "",
+									"description": "Filter by category (optional)"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search in title (optional)"
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Items per page (default: 10)"
+								}
+							]
+						},
+						"description": "Get all published research with filtering, search, and pagination"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Research by Slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/research/:slug",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "research", ":slug"],
+							"variable": [
+								{
+									"key": "slug",
+									"value": "machine-learning-research",
+									"description": "URL-friendly slug of the research"
+								}
+							]
+						},
+						"description": "Get single research detail by slug for reader page"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/categories",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "categories"]
+						},
+						"description": "Get all unique categories for filter menu"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Get All Research (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "bearer",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/research",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "admin", "research"]
+						},
+						"description": "Get all research including drafts for admin dashboard"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Research",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "bearer",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Machine Learning Research 2026",
+									"type": "text",
+									"description": "Research title (required)"
+								},
+								{
+									"key": "description",
+									"value": "# Introduction\n\nThis research explores...\n\n## Methodology\n\n...",
+									"type": "text",
+									"description": "Full description - Markdown/HTML (required)"
+								},
+								{
+									"key": "category",
+									"value": "AI",
+									"type": "text",
+									"description": "Category name (required)"
+								},
+								{
+									"key": "status",
+									"value": "draft",
+									"type": "text",
+									"description": "draft or published (optional, default: draft)"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "PDF file to upload (optional)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/research",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "admin", "research"]
+						},
+						"description": "Upload new research with PDF file"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Research",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "bearer",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Updated Title",
+									"type": "text",
+									"description": "New title (optional)"
+								},
+								{
+									"key": "description",
+									"value": "Updated description...",
+									"type": "text",
+									"description": "New description (optional)"
+								},
+								{
+									"key": "category",
+									"value": "Data Science",
+									"type": "text",
+									"description": "New category (optional)"
+								},
+								{
+									"key": "status",
+									"value": "published",
+									"type": "text",
+									"description": "draft or published (optional)"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "",
+									"description": "New PDF file - old file will be deleted (optional)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/research/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "admin", "research", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "64a1b2c3d4e5f6789012345",
+									"description": "MongoDB ObjectId of the research"
+								}
+							]
+						},
+						"description": "Update research metadata or replace PDF file"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Research",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "bearer",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/research/:id",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "v1", "admin", "research", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "64a1b2c3d4e5f6789012345",
+									"description": "MongoDB ObjectId of the research"
+								}
+							]
+						},
+						"description": "Delete research from DB and remove PDF from Cloudinary"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
