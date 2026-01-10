@@ -40,6 +40,12 @@ const authPermisionMiddleware = async (req, res, next) => {
         if (!user) return res.status(404).json({
             message: 'User has ben deleted',
         })
+        // Attach user to request object for activity logging
+        req.user = {
+            _id: user._id,
+            username: user.username,
+            name: user.name || user.username
+        }
         next()
         return
     }
