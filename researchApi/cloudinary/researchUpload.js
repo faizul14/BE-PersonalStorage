@@ -6,7 +6,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'research_papers',
-        resource_type: 'raw', // allows pdf, jpg, etc
+        resource_type: 'raw',
     },
 })
 

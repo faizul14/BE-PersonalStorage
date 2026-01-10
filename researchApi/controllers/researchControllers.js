@@ -2,12 +2,8 @@ const Research = require('../models/Research')
 const cloudinary = require('../../cloudinary/cloudinary')
 const slugify = require('slugify')
 const { logActivity } = require('./activityLogControllers')
+const { incrementResearchCount, decrementResearchCount } = require('./categoryControllers')
 
-// ==========================================
-// Public Controllers
-// ==========================================
-
-// Get all published research with filtering, search, and pagination
 const getAllResearch = async (req, res) => {
     try {
         const { category, search, page = 1, limit = 10 } = req.query
@@ -42,7 +38,6 @@ const getAllResearch = async (req, res) => {
     }
 }
 
-// Get single research detail by slug
 const getResearchBySlug = async (req, res) => {
     try {
         const { slug } = req.params
@@ -58,7 +53,6 @@ const getResearchBySlug = async (req, res) => {
     }
 }
 
-// Get all unique categories (legacy - kept for backward compatibility)
 const getCategories = async (req, res) => {
     try {
         const categories = await Research.distinct('category', { status: 'published' })
@@ -68,11 +62,6 @@ const getCategories = async (req, res) => {
     }
 }
 
-// ==========================================
-// Admin Controllers
-// ==========================================
-
-// Get all research (drafts & published) for admin dashboard
 const getAdminResearch = async (req, res) => {
     try {
         const research = await Research.find().sort({ createdAt: -1 })
@@ -82,7 +71,6 @@ const getAdminResearch = async (req, res) => {
     }
 }
 
-// Create new research
 const createResearch = async (req, res) => {
     try {
         const { title, description, category, status } = req.body
@@ -112,7 +100,8 @@ const createResearch = async (req, res) => {
             status: status || 'draft'
         })
 
-        // Log activity
+        await incrementResearchCount(category)
+
         if (req.user) {
             await logActivity({
                 action: 'create',
@@ -133,7 +122,6 @@ const createResearch = async (req, res) => {
     }
 }
 
-// Update existing research
 const updateResearch = async (req, res) => {
     try {
         const { id } = req.params
@@ -145,6 +133,8 @@ const updateResearch = async (req, res) => {
             return res.status(404).json({ message: 'Research not found' })
         }
 
+        const oldCategory = research.category
+
         if (title) {
             research.title = title
             research.slug = slugify(title, { lower: true, strict: true })
@@ -154,7 +144,6 @@ const updateResearch = async (req, res) => {
         if (status) research.status = status
 
         if (file) {
-            // Delete old file if exists
             if (research.cloudinary_public_id) {
                 await cloudinary.uploader.destroy(research.cloudinary_public_id)
             }
@@ -164,7 +153,11 @@ const updateResearch = async (req, res) => {
 
         await research.save()
 
-        // Log activity
+        if (category && category !== oldCategory) {
+            await decrementResearchCount(oldCategory)
+            await incrementResearchCount(category)
+        }
+
         if (req.user) {
             await logActivity({
                 action: 'update',
@@ -184,7 +177,6 @@ const updateResearch = async (req, res) => {
     }
 }
 
-// Delete research and associated Cloudinary file
 const deleteResearch = async (req, res) => {
     try {
         const { id } = req.params
@@ -194,16 +186,17 @@ const deleteResearch = async (req, res) => {
             return res.status(404).json({ message: 'Research not found' })
         }
 
-        // Delete file from Cloudinary
         if (research.cloudinary_public_id) {
             await cloudinary.uploader.destroy(research.cloudinary_public_id)
         }
 
         const researchTitle = research.title
         const researchId = research._id
+        const researchCategory = research.category
         await research.deleteOne()
 
-        // Log activity
+        await decrementResearchCount(researchCategory)
+
         if (req.user) {
             await logActivity({
                 action: 'delete',

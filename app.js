@@ -11,6 +11,8 @@ const xlinformation = require('./apitokenxl/routes/informationRoutes')
 const publicxlinformation = require('./apitokenxl/routes/informationPublicRoutes')
 const researchPublicRoutes = require('./researchApi/routes/researchPublicRoutes')
 const researchAdminRoutes = require('./researchApi/routes/researchAdminRoutes')
+const categoryAdminRoutes = require('./researchApi/routes/categoryAdminRoutes')
+const activityLogRoutes = require('./researchApi/routes/activityLogRoutes')
 const { authPermisionMiddleware } = require('./middleware/authMiddleware')
 
 const app = express()
@@ -42,5 +44,7 @@ app.use('/api/public/xlinformation', publicxlinformation)
 // 🚀 Api for research
 app.use('/api/v1', researchPublicRoutes)
 app.use('/api/v1/admin/research', authPermisionMiddleware, researchAdminRoutes)
+app.use('/api/v1/admin/categories', authPermisionMiddleware, categoryAdminRoutes)
+app.use('/api/v1/admin/activity', authPermisionMiddleware, activityLogRoutes)
 
 module.exports = app

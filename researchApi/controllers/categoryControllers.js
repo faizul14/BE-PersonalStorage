@@ -2,11 +2,6 @@ const Category = require('../models/Category')
 const Research = require('../models/Research')
 const { logActivity } = require('./activityLogControllers')
 
-// ==========================================
-// Public Controllers
-// ==========================================
-
-// Get all category names (for frontend dropdown)
 const getPublicCategories = async (req, res) => {
     try {
         const categories = await Category.find({}).select('name -_id').sort({ name: 1 })
@@ -17,11 +12,6 @@ const getPublicCategories = async (req, res) => {
     }
 }
 
-// ==========================================
-// Admin Controllers
-// ==========================================
-
-// Get all categories with details
 const getAllCategories = async (req, res) => {
     try {
         const categories = await Category.find({}).sort({ createdAt: -1 })
@@ -34,7 +24,6 @@ const getAllCategories = async (req, res) => {
     }
 }
 
-// Create new category
 const createCategory = async (req, res) => {
     try {
         const { name, description } = req.body
@@ -43,7 +32,6 @@ const createCategory = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Category name is required' })
         }
 
-        // Check if category already exists
         const existingCategory = await Category.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } })
         if (existingCategory) {
             return res.status(400).json({ success: false, message: 'Category with this name already exists' })
@@ -54,7 +42,6 @@ const createCategory = async (req, res) => {
             description: description || ''
         })
 
-        // Log activity
         if (req.user) {
             await logActivity({
                 action: 'create',
@@ -78,7 +65,6 @@ const createCategory = async (req, res) => {
     }
 }
 
-// Update category
 const updateCategory = async (req, res) => {
     try {
         const { id } = req.params
@@ -130,7 +116,6 @@ const updateCategory = async (req, res) => {
     }
 }
 
-// Delete category
 const deleteCategory = async (req, res) => {
     try {
         const { id } = req.params
@@ -140,7 +125,6 @@ const deleteCategory = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Category not found' })
         }
 
-        // Check if any research is using this category
         const researchCount = await Research.countDocuments({ category: category.name })
         if (researchCount > 0) {
             return res.status(400).json({
@@ -152,7 +136,6 @@ const deleteCategory = async (req, res) => {
         const categoryName = category.name
         await category.deleteOne()
 
-        // Log activity
         if (req.user) {
             await logActivity({
                 action: 'delete',
@@ -175,10 +158,34 @@ const deleteCategory = async (req, res) => {
     }
 }
 
+const incrementResearchCount = async (categoryName) => {
+    try {
+        await Category.findOneAndUpdate(
+            { name: categoryName },
+            { $inc: { researchCount: 1 } }
+        )
+    } catch (error) {
+        console.error('Failed to increment research count:', error.message)
+    }
+}
+
+const decrementResearchCount = async (categoryName) => {
+    try {
+        await Category.findOneAndUpdate(
+            { name: categoryName, researchCount: { $gt: 0 } },
+            { $inc: { researchCount: -1 } }
+        )
+    } catch (error) {
+        console.error('Failed to decrement research count:', error.message)
+    }
+}
+
 module.exports = {
     getPublicCategories,
     getAllCategories,
     createCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    incrementResearchCount,
+    decrementResearchCount
 }

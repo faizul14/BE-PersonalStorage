@@ -1,10 +1,5 @@
 const ActivityLog = require('../models/ActivityLog')
 
-// ==========================================
-// Helper Function
-// ==========================================
-
-// Log activity to database
 const logActivity = async (data) => {
     try {
         await ActivityLog.create({
@@ -18,16 +13,10 @@ const logActivity = async (data) => {
             ipAddress: data.ipAddress || ''
         })
     } catch (error) {
-        // Log error but don't throw - activity logging should not break main operations
         console.error('Failed to log activity:', error.message)
     }
 }
 
-// ==========================================
-// Admin Controllers
-// ==========================================
-
-// Get activity logs with pagination and filtering
 const getActivityLogs = async (req, res) => {
     try {
         const {
